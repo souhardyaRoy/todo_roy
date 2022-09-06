@@ -13,12 +13,17 @@ app.use(express.json());
 app.get('/', (req, res) => res.json({ 'message': 'server is running' }));
 app.use('/todo', todoRoutes);
 
-mongoose.connect(DATABASE_URL, { useNewUrlParser: true })
-  .then(() => {
-    console.log('Database connection successful');
-    app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
-  })
-  .catch((err) => {
-    console.log('Database connection failed');
-    console.log(err);
-  })
+const DB_URI = process.env.DB_URI;
+mongoose.Promise = global.Promise;
+
+const _option = {
+    socketTimeoutMS: 0,
+    keepAlive: true,
+    useNewUrlParser: true,
+};
+
+mongoose.connect(DATABASE_URL, _option).then(()=> console.log(`DB connected`)).catch(err=> {
+    console.error(err);
+    
+    process.exit(1);
+});
